@@ -13,25 +13,26 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.12</version>
+    <version>4.16</version>
     <relativePath />
   </parent>
 
   <artifactId>google-container-registry-auth</artifactId>
   <packaging>hpi</packaging>
+  <name>Google Container Registry Auth Plugin</name>
+  <version>0.4-SNAPSHOT</version>
+
   <properties>
     <jenkins.version>2.277.1</jenkins.version>
     <java.level>8</java.level>
-    <no-test-jar>false</no-test-jar>
+    <findbugs.failOnError>false</findbugs.failOnError>
   </properties>
-  <version>0.4-SNAPSHOT</version>
 
-  <name>Google Container Registry Auth Plugin</name>
   <description>
     This plugin exposes a credential for use with the Docker Build Step plugin for authenticating with Google Container Registry as a service account.
   </description>
@@ -67,7 +68,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
         <configuration>
           <failOnError>false</failOnError>
         </configuration>
@@ -89,26 +89,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <forceJavacCompilerUse>true</forceJavacCompilerUse>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.jenkins-ci.tools</groupId>
-        <artifactId>maven-hpi-plugin</artifactId>
-        <version>3.17</version>
-        <extensions>true</extensions>
-        <configuration>
-          <disabledTestInjection>true</disabledTestInjection>
-          <minimumJavaVersion/>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>2.9</version>
         <configuration>
@@ -126,25 +106,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>3.0.5</version>
-        <configuration>
-          <failOnError>false</failOnError>
-          <effort>Max</effort>
-          <threshold>Medium</threshold>
-          <xmlOutput>true</xmlOutput>
-          <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
@@ -165,9 +127,14 @@
     </plugins>
   </build>
 
+  <issueManagement>
+    <system>JIRA</system>
+    <url>http://issues.jenkins-ci.org/</url>
+  </issueManagement>
+
   <distributionManagement>
     <repository>
-      <id>repo.jenkins-ci.org</id>
+      <id>maven.jenkins-ci.org</id>
       <url>https://repo.jenkins-ci.org/releases</url>
     </repository>
   </distributionManagement>
@@ -177,20 +144,12 @@
       <id>repo.jenkins-ci.org</id>
       <url>https://repo.jenkins-ci.org/public/</url>
     </repository>
-    <repository>
-      <id>repo.jenkins-ci.org-releases</id>
-      <url>https://repo.jenkins-ci.org/releases/</url>
-    </repository>
-
   </repositories>
+
   <pluginRepositories>
     <pluginRepository>
-      <id>repo.jenkins-ci.org-pub</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </pluginRepository>
-    <pluginRepository>
       <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/releases/</url>
+      <url>https://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
 
@@ -198,8 +157,8 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.222.x</artifactId>
-        <version>26</version>
+        <artifactId>bom-2.277.x</artifactId>
+        <version>29</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -250,13 +209,6 @@
       <version>1.39.2</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-component-annotations -->
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-      <version>2.1.0</version>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-plugin-api -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -285,18 +237,11 @@
       <version>3.8.1</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-jaxb-annotations -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.module</groupId>
-      <artifactId>jackson-module-jaxb-annotations</artifactId>
-      <version>2.12.1</version>
-    </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -306,5 +251,13 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.jenkins-ci.main/jenkins-war
+    <dependency>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>jenkins-war</artifactId>
+      <version>2.277.1</version>
+      <scope>test</scope>
+    </dependency>
+-->
   </dependencies>
 </project>

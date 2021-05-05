@@ -1,3 +1,4 @@
+# Maven
 target/
 work/
 pom.xml.tag
@@ -7,6 +8,12 @@ pom.xml.next
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
+build.xml
+.mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+.mvn/wrapper/maven-wrapper.jar
+maven-build.properties
+maven-build.xml
 
 # IntelliJ
 .idea/

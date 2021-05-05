@@ -42,18 +42,19 @@ import com.google.jenkins.plugins.credentials.oauth.GoogleRobotCredentialsModule
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 import org.acegisecurity.Authentication;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -203,7 +204,7 @@ public class GoogleContainerRegistryCredentialProviderTest {
    * known ids.  Commonly used to drive mock behavior for the return value of
    * FakeCredentialsProvider's getCredentials() output.
    */
-  List<GoogleRobotCredentials> getInputCredentials(List<String> credentialIds) {
+  public List<GoogleRobotCredentials> getInputCredentials(List<String> credentialIds) {
     List<GoogleRobotCredentials> list =
         new LinkedList<GoogleRobotCredentials>();
     for (String id : credentialIds) {
@@ -329,14 +330,14 @@ public class GoogleContainerRegistryCredentialProviderTest {
     when(fakeProvider.getCredentials(
         eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
-            ImmutableList.<DomainRequirement>of(
+            ImmutableList.of(
                 new GoogleContainerRegistryScopeRequirement()))))
         .thenReturn(getInputCredentials(ImmutableList.of("foo")));
 
     assertEquals(new LinkedList<GoogleRobotCredentials>(),
         underTest.getCredentials(GoogleRobotCredentials.class,
             Jenkins.get(), ACL.SYSTEM,
-            ImmutableList.<DomainRequirement>of()));
+            ImmutableList.of()));
     // The above path should not only return no credentials, but also fail fast
     // to avoid any lookup of prospective source credentials.
     verifyZeroInteractions(fakeProvider);
@@ -358,24 +359,37 @@ public class GoogleContainerRegistryCredentialProviderTest {
     when(fakeProvider.getCredentials(
         eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
-            ImmutableList.<DomainRequirement>of(
+            ImmutableList.of(
                 new GoogleContainerRegistryScopeRequirement()))))
         .thenReturn(getInputCredentials(expectedCredentialsIds));
-    when(fakeProvider.getCredentials(
+
+    /*doReturn(getInputCredentials(expectedCredentialsIds)).when(fakeProvider).getCredentials(
+            eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
+            eq(ACL.SYSTEM), eq(buildMyDomainRequirementMatcher(
+                    ImmutableList.of(
+                            new GoogleContainerRegistryScopeRequirement()))));
+*/
+    /* when(fakeProvider.getCredentials(
         eq(UsernamePasswordCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
             requirements))).thenReturn(
         new LinkedList<UsernamePasswordCredentials>());
+*/
+    doReturn(new LinkedList<UsernamePasswordCredentials>()).when(fakeProvider).getCredentials(
+            eq(UsernamePasswordCredentials.class), eq(Jenkins.get()),
+            eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
+                    requirements)
+    );
 
-    assertEquals(getExpectedOutputCredentials(expectedCredentialsIds),
+    Assert.assertEquals(getExpectedOutputCredentials(expectedCredentialsIds),
         CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
             Jenkins.get(), ACL.SYSTEM, requirements));
 
     verify(fakeProvider).getCredentials(
         eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
-        eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
-            ImmutableList.<DomainRequirement>of(
-                new GoogleContainerRegistryScopeRequirement())));
+        eq(ACL.SYSTEM), eq(buildMyDomainRequirementMatcher(
+            ImmutableList.of(
+                new GoogleContainerRegistryScopeRequirement()))));
     verify(fakeProvider).getCredentials(
         eq(UsernamePasswordCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(requirements)
@@ -387,7 +401,7 @@ public class GoogleContainerRegistryCredentialProviderTest {
     // This is exactly like testEndToEndNoRequirements, except it
     // adds a DomainRequirement that is consistent with the credential type.
     List<DomainRequirement> requirements =
-        Lists.<DomainRequirement>newArrayList(
+        Lists.newArrayList(
             new HostnameRequirement("gcr.io"),
             new SchemeRequirement("https")
         );
@@ -398,17 +412,36 @@ public class GoogleContainerRegistryCredentialProviderTest {
     assertFalse(UsernamePasswordCredentials.class.isAssignableFrom(
         GoogleRobotCredentials.class));
     // Prescribe mock behavior.
-    when(fakeProvider.getCredentials(
+
+//    bar = fakeProvider
+  //  getFoo = getCredentials
+
+   // when(bar.getFoo()).thenReturn(fooBar);
+    //doReturn(fooBar).when(bar).getFoo()
+
+    doReturn(getInputCredentials(expectedCredentialsIds)).when(fakeProvider).getCredentials(
+            eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
+            eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
+                    ImmutableList.of(
+                            new GoogleContainerRegistryScopeRequirement())));
+
+    doReturn(new LinkedList<UsernamePasswordCredentials>()).when(fakeProvider).getCredentials(
+            eq(UsernamePasswordCredentials.class), eq(Jenkins.get()),
+            eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
+                    requirements)
+    );
+
+    /*when(fakeProvider.getCredentials(
         eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
             ImmutableList.<DomainRequirement>of(
                 new GoogleContainerRegistryScopeRequirement()))))
-        .thenReturn(getInputCredentials(expectedCredentialsIds));
-    when(fakeProvider.getCredentials(
+        .thenReturn(getInputCredentials(expectedCredentialsIds)); */
+    /*when(fakeProvider.getCredentials(
         eq(UsernamePasswordCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
             requirements))).thenReturn(
-        new LinkedList<UsernamePasswordCredentials>());
+        new LinkedList<UsernamePasswordCredentials>()); */
 
     assertEquals(getExpectedOutputCredentials(expectedCredentialsIds),
         CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
@@ -417,7 +450,7 @@ public class GoogleContainerRegistryCredentialProviderTest {
     verify(fakeProvider).getCredentials(
         eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
-            ImmutableList.<DomainRequirement>of(
+            ImmutableList.of(
                 new GoogleContainerRegistryScopeRequirement())));
     verify(fakeProvider).getCredentials(
         eq(UsernamePasswordCredentials.class), eq(Jenkins.get()),
@@ -430,7 +463,7 @@ public class GoogleContainerRegistryCredentialProviderTest {
     // Request for container.cloud.google.com but only credentials with docker
     // hub is provided.
     List<DomainRequirement> requirements =
-        Lists.<DomainRequirement>newArrayList(
+        Lists.newArrayList(
             new HostnameRequirement("gcr.io"),
             new SchemeRequirement("https")
         );
@@ -460,7 +493,7 @@ public class GoogleContainerRegistryCredentialProviderTest {
     verify(fakeProvider).getCredentials(
         eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
-            ImmutableList.<DomainRequirement>of(
+            ImmutableList.of(
                 new GoogleContainerRegistryScopeRequirement())));
     verify(fakeProvider).getCredentials(
         eq(UsernamePasswordCredentials.class), eq(Jenkins.get()),
@@ -475,7 +508,7 @@ public class GoogleContainerRegistryCredentialProviderTest {
     // quit and neither return credentials nor invoke the mock itself (the mock
     // still gets the one invocation direct from the CredentialProvider).
     List<DomainRequirement> requirements =
-        Lists.<DomainRequirement>newArrayList(
+        Lists.newArrayList(
             new SchemeRequirement("ssh"));
     List<String> expectedCredentialsIds = Lists.newArrayList("foo", "bar");
     // Quickly sanity-check this behavior or else the mocked return values
@@ -487,7 +520,7 @@ public class GoogleContainerRegistryCredentialProviderTest {
     when(fakeProvider.getCredentials(
         eq(GoogleRobotCredentials.class), eq(Jenkins.get()),
         eq(ACL.SYSTEM), buildMyDomainRequirementMatcher(
-            ImmutableList.<DomainRequirement>of(
+            ImmutableList.of(
                 new GoogleContainerRegistryScopeRequirement()))))
         .thenReturn(getInputCredentials(expectedCredentialsIds));
     when(fakeProvider.getCredentials(

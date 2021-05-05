@@ -40,6 +40,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.jenkins.plugins.credentials.domains.DomainRequirementProvider;
 import com.google.jenkins.plugins.credentials.oauth.GoogleRobotCredentials;
 
+import jenkins.util.JenkinsJVM;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
@@ -116,7 +117,7 @@ public class GoogleContainerRegistryCredential
    * serialize things.
    */
   private boolean isOnMaster() {
-    return Jenkins.getInstanceOrNull() != null;
+    return JenkinsJVM.isJenkinsJVM();
   }
 
   /**
